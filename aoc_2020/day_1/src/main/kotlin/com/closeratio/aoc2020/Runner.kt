@@ -8,8 +8,15 @@ object Runner {
         println(product)
     }
 
+    fun part2() {
+        val report = ExpenseReport.from(javaClass.getResource("/input.txt").readText())
+        val product = report.calculateTripleProduct(2020)
+        println(product)
+    }
+
 }
 
 fun main() {
     Runner.part1()
+    Runner.part2()
 }

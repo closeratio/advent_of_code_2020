@@ -7,7 +7,7 @@ class ExpenseReport(
     fun calculatePairProduct(
             desiredSum: Long
     ): Long {
-        val pair= items
+        val pair = items
                 .asSequence()
                 .mapIndexed { index, value ->
                     value to ArrayList(items).apply { removeAt(index) }
@@ -22,6 +22,39 @@ class ExpenseReport(
                 ?: throw IllegalStateException("Unable to find pair which sums to $desiredSum")
 
         return pair.first * pair.second
+    }
+
+    fun calculateTripleProduct(
+            desiredSum: Long
+    ): Long {
+        val triple = items
+                .asSequence()
+                .mapIndexed { index, value ->
+                    value to ArrayList(items).apply { removeAt(index) }
+                }
+                .flatMap { (firstValue, sublist) ->
+                    sublist.flatMap {
+                        sublist.mapIndexed { index, secondValue ->
+                            Triple(
+                                    firstValue,
+                                    secondValue,
+                                    ArrayList(items).apply { removeAt(index) }
+                            )
+                        }
+                    }
+                }
+                .flatMap { (first, second, third) ->
+                    third.map {
+                        Triple(first, second, it)
+                    }
+                }
+                .filter {
+                    (first, second, third) -> first + second + third == desiredSum
+                }
+                .firstOrNull()
+                ?: throw IllegalStateException("Unable to find triple which sums to $desiredSum")
+
+        return triple.first * triple.second * triple.third
     }
 
     companion object {
