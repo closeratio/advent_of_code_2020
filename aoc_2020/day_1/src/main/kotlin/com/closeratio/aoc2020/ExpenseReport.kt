@@ -4,64 +4,52 @@ class ExpenseReport(
         val items: List<Long>
 ) {
 
+    fun evaluateIndexes(
+            indexes: Sequence<List<Int>>,
+            desiredSum: Long
+    ): Long = indexes
+            // Check that indices are different
+            .filter { HashSet(it).size == it.size }
+            // Check that values sum to desired value
+            .filter {
+                (it.fold(0L) { acc, curr ->
+                    acc + items[curr]
+                }) == desiredSum
+            }
+            .map { it.fold(1L) { acc, curr -> acc * items[curr] } }
+            .firstOrNull()
+            ?: throw IllegalStateException("Unable to find set which sums to $desiredSum")
+
     fun calculatePairProduct(
             desiredSum: Long
-    ): Long {
-        val pair = items
-                .asSequence()
-                .mapIndexed { index, value ->
-                    value to ArrayList(items).apply { removeAt(index) }
+    ): Long = IntRange(0, items.size - 1)
+            .asSequence()
+            .flatMap { firstIndex ->
+                IntRange(0, items.size - 1).map {
+                    listOf(firstIndex, it)
                 }
-                .flatMap { (value, sublist) ->
-                    sublist.map { value to it }
-                }
-                .filter {
-                    (left, right) -> left + right == desiredSum
-                }
-                .firstOrNull()
-                ?: throw IllegalStateException("Unable to find pair which sums to $desiredSum")
-
-        return pair.first * pair.second
-    }
+            }
+            .let { evaluateIndexes(it, desiredSum) }
 
     fun calculateTripleProduct(
             desiredSum: Long
-    ): Long {
-        val triple = items
-                .asSequence()
-                .mapIndexed { index, value ->
-                    value to ArrayList(items).apply { removeAt(index) }
-                }
-                .flatMap { (firstValue, sublist) ->
-                    sublist.flatMap {
-                        sublist.mapIndexed { index, secondValue ->
-                            Triple(
-                                    firstValue,
-                                    secondValue,
-                                    ArrayList(items).apply { removeAt(index) }
-                            )
-                        }
+    ): Long = IntRange(0, items.size - 1)
+            .asSequence()
+            .flatMap { firstIndex ->
+                IntRange(0, items.size - 1).flatMap { secondIndex ->
+                    IntRange(0, items.size - 1).map {
+                        listOf(firstIndex, secondIndex, it)
                     }
                 }
-                .flatMap { (first, second, third) ->
-                    third.map {
-                        Triple(first, second, it)
-                    }
-                }
-                .filter {
-                    (first, second, third) -> first + second + third == desiredSum
-                }
-                .firstOrNull()
-                ?: throw IllegalStateException("Unable to find triple which sums to $desiredSum")
-
-        return triple.first * triple.second * triple.third
-    }
+            }
+            .let { evaluateIndexes(it, desiredSum) }
 
     companion object {
         fun from(input: String): ExpenseReport = input
                 .trim()
                 .split("\n")
                 .map { it.toLong() }
+                .sorted()
                 .let {
                     ExpenseReport(it)
                 }
