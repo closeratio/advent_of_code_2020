@@ -1,19 +1,25 @@
 package com.closeratio.aoc2020
 
-abstract class AbstractRunner {
+import kotlin.system.measureTimeMillis
 
-    abstract fun part1()
+abstract class AbstractRunner<T> {
 
-    abstract fun part2()
+    abstract fun part1(): T
+
+    abstract fun part2(): T
 
     fun runBothParts() {
-        runTimed(
-                { println("Part 1 took ${it}ms") }
-        ) { part1() }
+        val part1Time = measureTimeMillis {
+            val result = part1()
+            println("Part 1 result: $result")
+        }
+        println("Part 1 took ${part1Time}ms")
 
-        runTimed(
-                { println("Part 2 took ${it}ms") }
-        ) { part2() }
+        val part2Time = measureTimeMillis {
+            val result = part2()
+            println("Part 2 result: $result")
+        }
+        println("Part 2 took ${part2Time}ms")
     }
 
 }

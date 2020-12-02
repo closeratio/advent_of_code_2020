@@ -1,17 +1,15 @@
 package com.closeratio.aoc2020
 
-object Runner: AbstractRunner() {
+object Runner: AbstractRunner<Long>() {
 
-    override fun part1() {
+    override fun part1(): Long {
         val report = ExpenseReport.from(javaClass.getResource("/input.txt").readText())
-        val product = report.calculatePairProduct(2020)
-        println(product)
+        return report.calculatePairProduct(2020)
     }
 
-    override fun part2() {
+    override fun part2(): Long {
         val report = ExpenseReport.from(javaClass.getResource("/input.txt").readText())
-        val product = report.calculateTripleProduct(2020)
-        println(product)
+        return report.calculateTripleProduct(2020)
     }
 
     @JvmStatic
