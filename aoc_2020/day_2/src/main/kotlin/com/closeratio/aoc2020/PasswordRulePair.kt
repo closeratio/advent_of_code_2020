@@ -6,8 +6,8 @@ data class PasswordRulePair(
 ) {
 
     fun isValidOldRules() = password
-        .groupBy({ it }) { 1 }
-        .mapValues { (_, value) -> value.sum() }
+        .groupBy { it }
+        .mapValues { (_, characters) -> characters.size }
         .getOrDefault(rule.character, 0)
         .let {
             it >= rule.lower && it <= rule.upper
