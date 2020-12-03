@@ -10,7 +10,7 @@ class SlopeMap(
 
     fun treeCount(
         direction: Vec2i
-    ): Int {
+    ): Long {
         val positions = arrayListOf(Vec2i.ZERO)
 
         while (positions.last().y < height - 1) {
@@ -20,6 +20,7 @@ class SlopeMap(
         return positions
             .filter { containsTree(it) }
             .size
+            .toLong()
     }
 
     private fun containsTree(pos: Vec2i): Boolean {
