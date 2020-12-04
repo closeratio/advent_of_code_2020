@@ -9,7 +9,7 @@ class BatchFileParserTest {
 
     @Test
     fun parse() {
-        val dataList = BatchFileParser.parse(javaClass.getResource("/test_input_1.txt").readText())
+        val dataList = BatchFileParser.parse(javaClass.getResource("/test_input_loosely_valid_and_invalid.txt").readText())
 
         assertThat(dataList, hasSize(4))
 
