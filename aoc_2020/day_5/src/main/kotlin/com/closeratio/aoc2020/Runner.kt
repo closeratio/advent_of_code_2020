@@ -2,7 +2,7 @@ package com.closeratio.aoc2020
 
 object Runner: AbstractRunner<Int>() {
 
-    val boardingPasses = javaClass.getResource("/input.txt")
+    private val boardingPasses = javaClass.getResource("/input.txt")
         .readText()
         .trim()
         .split("\n")

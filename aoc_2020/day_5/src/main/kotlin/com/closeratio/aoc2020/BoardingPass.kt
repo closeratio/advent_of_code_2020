@@ -8,13 +8,10 @@ data class BoardingPass(
         val rowString = data.take(7)
         val columnString = data.takeLast(3)
 
-        val rows = (1..128).map { Row(it - 1) }
-        val columns = (1..8).map { Column(it - 1) }
+        val rows = (0..127).map { Row(it) }
+        val columns = (0..7).map { Column(it) }
 
-        val rowId = getElementId(rowString, rows)
-        val columnId = getElementId(columnString, columns)
-
-        return rowId * 8 + columnId
+        return getElementId(rowString, rows) * 8 + getElementId(columnString, columns)
     }
 
     private fun getElementId(
@@ -28,9 +25,8 @@ data class BoardingPass(
         }
 
         val (leftChunk, rightChunk) = elements.chunked(elements.size / 2)
-        val regionChar = dataString[0]
 
-        return when(regionChar) {
+        return when(val regionChar = dataString[0]) {
             'F', 'L' -> getElementId(dataString.drop(1), leftChunk)
             'B', 'R' -> getElementId(dataString.drop(1), rightChunk)
             else -> throw IllegalArgumentException("Unknown region specifier: $regionChar")
