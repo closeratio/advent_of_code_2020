@@ -5,10 +5,12 @@ object Runner: AbstractRunner<Int>() {
     private val groups = GroupParser.parse(javaClass.getResource("/input.txt").readText())
 
     override fun part1(): Int = groups
-        .map { it.answerCount() }
+        .map { it.allAnswerCount() }
         .sum()
 
-    override fun part2(): Int = 0
+    override fun part2(): Int = groups
+        .map { it.commonAnswerCount() }
+        .sum()
 
     @JvmStatic
     fun main(args: Array<String>) {
