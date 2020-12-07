@@ -7,18 +7,27 @@ import org.junit.jupiter.api.Test
 
 class LuggageComputerTest {
 
-    val computer = LuggageComputer.from(javaClass.getResource("/test_input_1.txt").readText())
-
     @Test
     fun parse() {
-        assertThat(computer.bags, hasSize(9))
+        assertThat(
+            LuggageComputer.from(javaClass.getResource("/test_input_1.txt").readText()).bags,
+            hasSize(9)
+        )
     }
 
     @Test
-    fun calculateBagCount() {
+    fun calculateValidBags() {
         assertThat(
-            computer.calculateBagCount(Colour("shiny gold")),
+            LuggageComputer.from(javaClass.getResource("/test_input_1.txt").readText()).calculateValidBags(Colour("shiny gold")),
             `is`(4)
+        )
+    }
+
+    @Test
+    fun calculateChildBagCount() {
+        assertThat(
+            LuggageComputer.from(javaClass.getResource("/test_input_2.txt").readText()).calculateChildBagCount(Colour("shiny gold")),
+            `is`(126)
         )
     }
 

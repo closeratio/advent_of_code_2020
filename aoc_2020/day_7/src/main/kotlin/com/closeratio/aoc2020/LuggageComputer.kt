@@ -5,45 +5,63 @@ class LuggageComputer(
 ) {
 
     val bagTrees = bags.let {
-        val childColours = bags.flatMap { it.contents.keys }.toSet()
-        val colourMap = bags.associateBy { it.colour }
+        val childColours = bags
+            .flatMap { it.contents.keys }
+            .map { it.colour }
+            .toSet()
 
-        bags
-            .filter { it.colour !in childColours }
-            .map {
-                getBagNode(
-                    colourMap,
-                    it.colour
-                )
-            }
+        bags.filter { it.colour !in childColours }
     }
 
-    private fun getBagNode(
-        bagMap: Map<Colour, Bag>,
-        colour: Colour
-    ): BagNode = BagNode(
-        bagMap.getValue(colour),
-        bagMap.getValue(colour).contents.keys.map {
-            getBagNode(bagMap, it)
-        }
-    )
-
-    fun calculateBagCount(colour: Colour): Int {
+    fun calculateValidBags(colour: Colour): Int {
         return bagTrees
             .flatMap { it.getValidBags(colour) }
             .toSet()
             .size
     }
 
+    fun calculateChildBagCount(colour: Colour): Int = bagTrees
+        .asSequence()
+        .mapNotNull { it.findBag(colour) }
+        .first()
+        .calculateChildBagCount()
+        .toInt() - 1
+
     companion object {
-        fun from(data: String): LuggageComputer = data
-            .trim()
-            .split("\n")
-            .map { Bag.parse(it.trim()) }
-            .toSet()
-            .let {
-                LuggageComputer(it)
+
+        val BAG_COLOUR_REGEX = """^(.+) bags contain""".toRegex()
+        val CONTENTS_REGEX = """(\d+) ([a-z ]+) bags?""".toRegex()
+
+        fun from(data: String): LuggageComputer {
+            val lines = data
+                .trim()
+                .split("\n")
+                .map { it.trim() }
+
+            val bagMap = lines
+                .map { line ->
+                    Bag(
+                        Colour(BAG_COLOUR_REGEX.find(line)!!.groupValues[1]),
+                        hashMapOf()
+                    )
+                }
+                .associateBy { it.colour }
+
+            lines.forEach { line ->
+                val parentBag = bagMap.getValue(Colour(BAG_COLOUR_REGEX.find(line)!!.groupValues[1]))
+
+                CONTENTS_REGEX.findAll(line).forEach {
+                    val count = it.groupValues[1].toLong()
+                    val childBag = bagMap.getValue(Colour(it.groupValues[2]))
+
+                    parentBag.contents[childBag] = count
+                }
             }
+
+            return LuggageComputer(
+                bagMap.values.toSet()
+            )
+        }
     }
 
 }
