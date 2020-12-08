@@ -30,10 +30,21 @@ class ComputerTest {
     }
 
     @Test
-    fun iterateUntilInstructionRepeated() {
-        computer.iterateUntilInstructionRepeated()
+    fun iterateUntilLoopingOrFinished_Looping() {
+        val result = computer.iterateUntilLoopingOrFinished()
 
         assertThat(computer.accumulator, `is`(5))
+        assertThat(result, `is`(false))
+    }
+
+    @Test
+    fun iterateUntilLoopingOrFinished_Finished() {
+        computer.instructions[7] = NoOp()
+
+        val result = computer.iterateUntilLoopingOrFinished()
+
+        assertThat(computer.accumulator, `is`(8))
+        assertThat(result, `is`(true))
     }
 
 }

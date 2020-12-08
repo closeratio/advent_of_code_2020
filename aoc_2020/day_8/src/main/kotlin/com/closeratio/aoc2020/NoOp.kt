@@ -1,13 +1,17 @@
 package com.closeratio.aoc2020
 
-class NoOp : Instruction() {
+class NoOp(
+    val value: Long
+) : Instruction() {
 
     override fun execute(computer: Computer) {
         computer.programCounter++
     }
 
     companion object {
-        fun from(line: String): NoOp = NoOp()
+        fun from(line: String): NoOp = NoOp(
+            line.split(" ").last().toLong()
+        )
     }
 
     override fun equals(other: Any?): Boolean {

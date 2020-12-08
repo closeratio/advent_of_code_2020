@@ -1,23 +1,22 @@
 package com.closeratio.aoc2020
 
 class Computer(
-    val instructions: List<Instruction>,
+    val instructions: MutableList<Instruction>,
 ) {
 
     var programCounter: Int = 0
     var accumulator: Long = 0
 
-    fun iterate() {
-        instructions[programCounter].execute(this)
-    }
+    fun iterateUntilLoopingOrFinished(): Boolean {
+        val visited = linkedSetOf<Int>()
+        val validPcRange = 0 until instructions.size
 
-    fun iterateUntilInstructionRepeated() {
-        val visited = hashSetOf<Int>()
-
-        while (programCounter !in visited) {
+        while (programCounter !in visited && programCounter in validPcRange) {
             visited += programCounter
-            iterate()
+            instructions[programCounter].execute(this)
         }
+
+        return programCounter == instructions.size
     }
 
     companion object {
@@ -34,6 +33,7 @@ class Computer(
                     else -> throw IllegalArgumentException("Unknown operation: ${it.take(3)}")
                 }
             }
+            .toMutableList()
         )
 
     }
