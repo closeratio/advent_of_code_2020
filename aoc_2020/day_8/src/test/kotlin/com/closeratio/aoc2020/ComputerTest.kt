@@ -16,7 +16,7 @@ class ComputerTest {
 
         assertThat(
             computer.instructions, contains(
-                NoOp(),
+                NoOp(0),
                 Accumulate(1),
                 Jump(4),
                 Accumulate(3),
@@ -39,7 +39,7 @@ class ComputerTest {
 
     @Test
     fun iterateUntilLoopingOrFinished_Finished() {
-        computer.instructions[7] = NoOp()
+        computer.instructions[7] = NoOp(-4)
 
         val result = computer.iterateUntilLoopingOrFinished()
 

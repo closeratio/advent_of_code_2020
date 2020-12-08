@@ -12,32 +12,36 @@ object Runner : AbstractRunner<Long>() {
     override fun part2(): Long = Computer
         .from(javaClass.getResource("/input.txt").readText())
         .let { computer ->
+            // Generate replacement instructions
             computer.instructions
                 .mapIndexed { index, instruction -> index to instruction }
                 .filter { (_, instruction) -> instruction is NoOp || instruction is Jump }
-                .map { (replacementIndex, _) ->
-                    val modifiedComputer = Computer(
-                        computer.instructions
-                            .mapIndexed { index, instruction ->
-                                if (index != replacementIndex) {
-                                    instruction
-                                } else {
-                                    when (instruction) {
-                                        is NoOp -> Jump(instruction.value)
-                                        is Jump -> NoOp(instruction.amount)
-                                        else -> throw IllegalStateException("Unexpected instruction type: $instruction")
-                                    }
-                                }
-                            }
-                            .toMutableList()
+                .map { (replacementIndex, instruction) ->
+                    Triple(
+                        computer,
+                        replacementIndex,
+                        when (instruction) {
+                            is NoOp -> Jump(instruction.value)
+                            is Jump -> NoOp(instruction.amount)
+                            else -> throw IllegalStateException("Unexpected instruction type: $instruction")
+                        }
                     )
-
-                    val result = modifiedComputer.iterateUntilLoopingOrFinished()
-                    result to modifiedComputer.accumulator
                 }
-                .first { (result, _) -> result }
-                .second
         }
+        .asSequence()
+        .map { (computer, replacementIndex, replacementInstruction) ->
+            // Create another computer with the modified instruction
+            val modifiedComputer = Computer(
+                ArrayList(computer.instructions).apply {
+                    set(replacementIndex, replacementInstruction)
+                }
+            )
+
+            val result = modifiedComputer.iterateUntilLoopingOrFinished()
+            result to modifiedComputer.accumulator
+        }
+        .first { it.first }
+        .second
 
     @JvmStatic
     fun main(args: Array<String>) {
