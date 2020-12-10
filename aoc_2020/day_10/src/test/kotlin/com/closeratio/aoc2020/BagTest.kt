@@ -1,6 +1,7 @@
 package com.closeratio.aoc2020
 
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.`is`
 import org.hamcrest.collection.IsCollectionWithSize.hasSize
 import org.hamcrest.collection.IsIterableContainingInOrder.contains
 import org.hamcrest.collection.IsMapContaining.hasEntry
@@ -51,6 +52,22 @@ class BagTest {
 
         assertThat(differences, hasEntry(1, 22))
         assertThat(differences, hasEntry(3, 10))
+    }
+
+    @Test
+    fun validArrangements_testInput1() {
+        val bag = Bag.from(javaClass.getResource("/test_input_1.txt").readText())
+        val result: Long = bag.validArrangements()
+
+        assertThat(result, `is`(8))
+    }
+
+    @Test
+    fun validArrangements_testInput2() {
+        val bag = Bag.from(javaClass.getResource("/test_input_2.txt").readText())
+        val result: Long = bag.validArrangements()
+
+        assertThat(result, `is`(19208))
     }
 
 }

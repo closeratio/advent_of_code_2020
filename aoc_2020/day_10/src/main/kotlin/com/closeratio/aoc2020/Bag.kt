@@ -13,6 +13,47 @@ data class Bag(
         .groupBy { it }
         .mapValues { (_, values) -> values.size }
 
+    fun validArrangements(): Long = (listOf(0, deviceJoltage) + adapters.map { it.joltage })
+        .sorted()
+        .fold(arrayListOf<ArrayList<Long>>()) { acc, curr ->
+            // Create a new group if the list is empty or the diff to the last group is > 2
+            // Otherwise append this joltage to the current group
+            if (acc.isEmpty() || curr - acc.last().last() > 2) {
+                acc.add(arrayListOf(curr.toLong()))
+            } else {
+                acc.last().add(curr.toLong())
+            }
+
+            acc
+        }
+        .filter { it.size > 1 } // Groups with single elements don't matter
+        .map {
+            childStateCount(
+                listOf(it.first()),
+                it.drop(1)
+            )
+        }
+        .reduce { acc, curr -> acc * curr }
+
+    private fun childStateCount(
+        currList: List<Long>,
+        remainingItems: List<Long>
+    ): Long {
+        if (remainingItems.isEmpty()) {
+            return 1L
+        }
+
+        val last = currList.last()
+        val candidates = remainingItems.filter { it - last <= 3 }
+
+        return candidates.map { candidate ->
+            childStateCount(
+                currList + candidate,
+                remainingItems.filter { it > candidate }
+            )
+        }.reduce { acc, curr -> acc + curr }
+    }
+
     companion object {
 
         fun from(data: String): Bag = data
