@@ -4,9 +4,15 @@ import com.closeratio.aoc2020.State
 
 data class MoveEast(val amount: Int) : Instruction() {
 
-    override fun nextState(state: State): State = State(
+    override fun nextSimpleState(state: State): State = State(
         state.direction,
-        state.position.right(amount)
+        state.shipPosition.right(amount),
+        state.waypointPosition
     )
 
+    override fun nextComplexState(state: State): State = State(
+        state.direction,
+        state.shipPosition,
+        state.waypointPosition.right(amount)
+    )
 }

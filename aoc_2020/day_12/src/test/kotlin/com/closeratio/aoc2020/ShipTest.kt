@@ -4,6 +4,7 @@ import com.closeratio.aoc2020.Direction.EAST
 import com.closeratio.aoc2020.instruction.MoveForward
 import com.closeratio.aoc2020.instruction.MoveNorth
 import com.closeratio.aoc2020.instruction.TurnRight
+import com.closeratio.aoc2020.math.Vec2i
 import com.closeratio.aoc2020.math.Vec2i.Companion.ZERO
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
@@ -32,17 +33,25 @@ class ShipTest {
             ship.initialState, `is`(
                 State(
                     EAST,
-                    ZERO
+                    ZERO,
+                    Vec2i(10, -1)
                 )
             )
         )
     }
 
     @Test
-    fun executeInstructions() {
-        val result = ship.executeInstructions()
+    fun moveSimple() {
+        val result = ship.moveSimple()
 
         assertThat(result, `is`(25))
+    }
+
+    @Test
+    fun moveComplex() {
+        val result = ship.moveComplex()
+
+        assertThat(result, `is`(286))
     }
 
 }

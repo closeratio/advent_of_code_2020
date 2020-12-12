@@ -2,6 +2,7 @@ package com.closeratio.aoc2020
 
 import com.closeratio.aoc2020.Direction.EAST
 import com.closeratio.aoc2020.instruction.*
+import com.closeratio.aoc2020.math.Vec2i
 import com.closeratio.aoc2020.math.Vec2i.Companion.ZERO
 
 class Ship(
@@ -9,17 +10,23 @@ class Ship(
     val initialState: State
 ) {
 
-    fun executeInstructions(): Int {
+    private fun moveObject(
+        stateIterator: Instruction.(State) -> State
+    ): Int {
         val states = arrayListOf(initialState)
 
         instructions.forEach {
             states.add(
-                it.nextState(states.last())
+                it.stateIterator(states.last())
             )
         }
 
-        return states.last().position.manhattan()
+        return states.last().shipPosition.manhattan()
     }
+
+    fun moveSimple(): Int = moveObject { nextSimpleState(it) }
+
+    fun moveComplex(): Int = moveObject { nextComplexState(it) }
 
     companion object {
 
@@ -41,7 +48,7 @@ class Ship(
                         else -> throw IllegalArgumentException("Unknown instruction: $it")
                     }
                 },
-            State(EAST, ZERO)
+            State(EAST, ZERO, Vec2i(10, -1))
         )
 
     }

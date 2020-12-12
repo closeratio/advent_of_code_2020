@@ -1,6 +1,9 @@
 package com.closeratio.aoc2020.math
 
 import kotlin.math.absoluteValue
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 data class Vec2i(
     val x: Int,
@@ -29,6 +32,11 @@ data class Vec2i(
 
     fun left(): Vec2i = left(1)
     fun left(amount: Int): Vec2i = Vec2i(x - amount, y)
+
+    fun rotate(radians: Double): Vec2i = Vec2i(
+        (cos(radians) * x - sin(radians) * y).roundToInt(),
+        (sin(radians) * x + cos(radians) * y).roundToInt()
+    )
 
     operator fun plus(other: Vec2i): Vec2i = Vec2i(
         x + other.x,

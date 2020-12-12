@@ -5,14 +5,26 @@ import com.closeratio.aoc2020.State
 
 data class MoveForward(val amount: Int) : Instruction() {
 
-    override fun nextState(state: State): State = State(
+    override fun nextSimpleState(state: State): State = State(
         state.direction,
         when (state.direction) {
-            NORTH -> state.position.up(amount)
-            EAST -> state.position.right(amount)
-            SOUTH -> state.position.down(amount)
-            WEST -> state.position.left(amount)
-        }
+            NORTH -> state.shipPosition.up(amount)
+            EAST -> state.shipPosition.right(amount)
+            SOUTH -> state.shipPosition.down(amount)
+            WEST -> state.shipPosition.left(amount)
+        },
+        state.waypointPosition
     )
+
+    override fun nextComplexState(state: State): State {
+        val delta = state.waypointPosition - state.shipPosition
+        val newShipPost = (1..amount).fold(state.shipPosition) { acc, _ -> acc + delta }
+
+        return State(
+            state.direction,
+            newShipPost,
+            newShipPost + delta
+        )
+    }
 
 }
