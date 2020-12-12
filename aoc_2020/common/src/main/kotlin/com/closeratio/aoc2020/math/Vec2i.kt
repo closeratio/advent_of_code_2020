@@ -18,10 +18,17 @@ data class Vec2i(
         up().left()
     )
 
-    fun up(): Vec2i = Vec2i(x, y - 1)
-    fun right(): Vec2i = Vec2i(x + 1, y)
-    fun down(): Vec2i = Vec2i(x, y + 1)
-    fun left(): Vec2i = Vec2i(x - 1, y)
+    fun up(): Vec2i = up(1)
+    fun up(amount: Int): Vec2i = Vec2i(x, y - amount)
+
+    fun right(): Vec2i = right(1)
+    fun right(amount: Int): Vec2i = Vec2i(x + amount, y)
+
+    fun down(): Vec2i = down(1)
+    fun down(amount: Int): Vec2i = Vec2i(x, y + amount)
+
+    fun left(): Vec2i = left(1)
+    fun left(amount: Int): Vec2i = Vec2i(x - amount, y)
 
     operator fun plus(other: Vec2i): Vec2i = Vec2i(
         x + other.x,
@@ -39,6 +46,7 @@ data class Vec2i(
     )
 
     fun manhattan(other: Vec2i): Int = (other - this).abs().let { it.x + it.y }
+    fun manhattan(): Int = manhattan(ZERO)
 
     companion object {
         val ZERO = Vec2i(0, 0)
