@@ -17,6 +17,17 @@ data class BusSchedule(
         }
         .minByOrNull { it.second }!!
 
+    fun calculateSynchronisationTime(): Long = buses
+        .drop(1)
+        .fold(0L to buses.first().id) { (startTime, stepSize), (id, offset) ->
+            var currTime = startTime
+            while ((currTime + offset) % id != 0L) {
+                currTime += stepSize
+            }
+            currTime to stepSize * id
+        }
+        .first
+
     companion object {
 
         fun from(data: String): BusSchedule = data
@@ -27,8 +38,13 @@ data class BusSchedule(
                 BusSchedule(
                     busesString
                         .split(",")
-                        .mapNotNull { it.toLongOrNull() }
-                        .map { Bus(it) }
+                        .mapIndexedNotNull { index, value ->
+                            if (value.toLongOrNull() == null) {
+                                null
+                            } else {
+                                Bus(value.toLong(), index.toLong())
+                            }
+                        }
                         .toSet(),
                     time.toLong()
                 )

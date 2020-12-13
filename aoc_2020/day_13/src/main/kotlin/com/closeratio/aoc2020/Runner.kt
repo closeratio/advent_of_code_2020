@@ -8,7 +8,7 @@ object Runner : AbstractRunner<Long>() {
         bus.id * waitTime
     }
 
-    override fun part2(): Long = 0L
+    override fun part2(): Long = schedule.calculateSynchronisationTime()
 
     @JvmStatic
     fun main(args: Array<String>) {
