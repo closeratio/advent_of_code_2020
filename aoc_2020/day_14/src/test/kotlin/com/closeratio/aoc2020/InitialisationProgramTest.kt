@@ -26,10 +26,17 @@ class InitialisationProgramTest {
     }
 
     @Test
-    fun executeAndSum() {
-        val result = schedule.executeAndSum()
+    fun executeAndSumV1() {
+        val result = schedule.executeAndSumV1()
 
         assertThat(result, Matchers.`is`(165L))
+    }
+
+    @Test
+    fun executeAndSumV2() {
+        val result = InitialisationProgram.from(javaClass.getResource("/test_input_2.txt").readText()).executeAndSumV2()
+
+        assertThat(result, Matchers.`is`(208L))
     }
 
 }

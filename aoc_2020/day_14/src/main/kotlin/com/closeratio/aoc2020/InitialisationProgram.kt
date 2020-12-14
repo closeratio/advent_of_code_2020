@@ -4,7 +4,13 @@ data class InitialisationProgram(
     val instructions: List<Instruction>
 ) {
 
-    fun executeAndSum(): Long {
+    fun executeAndSum(
+        execute: Instruction.(
+            currentMask: String,
+            updateMemory: (Long, Long) -> Unit,
+            updateMask: (String) -> Unit
+        ) -> Unit
+    ): Long {
         var mask = ""
         val memoryMap = hashMapOf<Long, Long>()
 
@@ -19,6 +25,10 @@ data class InitialisationProgram(
 
         return memoryMap.values.sum()
     }
+
+    fun executeAndSumV1(): Long = executeAndSum(Instruction::executeV1)
+
+    fun executeAndSumV2(): Long = executeAndSum(Instruction::executeV2)
 
     companion object {
 

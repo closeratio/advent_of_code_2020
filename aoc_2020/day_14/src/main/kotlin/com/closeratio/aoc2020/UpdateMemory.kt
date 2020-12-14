@@ -5,7 +5,7 @@ data class UpdateMemory(
     val value: Long
 ) : Instruction() {
 
-    override fun execute(
+    override fun executeV1(
         currentMask: String,
         updateMemory: (Long, Long) -> Unit,
         updateMask: (String) -> Unit
@@ -26,4 +26,7 @@ data class UpdateMemory(
         updateMemory(address, newValue)
     }
 
+    override fun executeV2(currentMask: String, updateMemory: (Long, Long) -> Unit, updateMask: (String) -> Unit) {
+        TODO("Not yet implemented")
+    }
 }
