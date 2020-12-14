@@ -1,17 +1,15 @@
 package com.closeratio.aoc2020
 
-abstract class Instruction() {
+import com.closeratio.aoc2020.InitialisationProgram.Updater
+
+abstract class Instruction {
 
     abstract fun executeV1(
-        currentMask: String,
-        updateMemory: (Long, Long) -> Unit,
-        updateMask: (String) -> Unit
+        updater: Updater
     )
 
     abstract fun executeV2(
-        currentMask: String,
-        updateMemory: (Long, Long) -> Unit,
-        updateMask: (String) -> Unit
+        updater: Updater
     )
 
 }

@@ -1,20 +1,18 @@
 package com.closeratio.aoc2020
 
+import com.closeratio.aoc2020.InitialisationProgram.Updater
+
 data class SetMask(
     val newMask: String
 ) : Instruction() {
 
     override fun executeV1(
-        currentMask: String,
-        updateMemory: (Long, Long) -> Unit,
-        updateMask: (String) -> Unit
+        updater: Updater
     ) {
-        updateMask(newMask)
+        updater.updateMask(newMask)
     }
 
     override fun executeV2(
-        currentMask: String,
-        updateMemory: (Long, Long) -> Unit,
-        updateMask: (String) -> Unit
-    ) = executeV1(currentMask, updateMemory, updateMask)
+        updater: Updater
+    ) = executeV1(updater)
 }

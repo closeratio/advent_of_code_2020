@@ -4,11 +4,9 @@ data class InitialisationProgram(
     val instructions: List<Instruction>
 ) {
 
-    fun executeAndSum(
+    private fun executeAndSum(
         execute: Instruction.(
-            currentMask: String,
-            updateMemory: (Long, Long) -> Unit,
-            updateMask: (String) -> Unit
+            updater: Updater
         ) -> Unit
     ): Long {
         var mask = ""
@@ -16,11 +14,12 @@ data class InitialisationProgram(
 
         instructions.forEach { instruction ->
             instruction.execute(
-                mask,
-                { index, value -> memoryMap[index] = value }
-            ) { newMask ->
-                mask = newMask
-            }
+                Updater(
+                    mask,
+                    { index, value -> memoryMap[index] = value },
+                    { newMask -> mask = newMask }
+                )
+            )
         }
 
         return memoryMap.values.sum()
@@ -53,6 +52,12 @@ data class InitialisationProgram(
             }
 
     }
+
+    class Updater(
+        val mask: String,
+        val updateMemory: (Long, Long) -> Unit,
+        val updateMask: (String) -> Unit
+    )
 
 }
 
