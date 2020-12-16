@@ -23,7 +23,14 @@ class MemoryGame(
                     diff
                 }
 
-                numberHistory.getOrPut(last) { arrayListOf() }.add(index - 1)
+                numberHistory
+                    .getOrPut(last) { arrayListOf() }.let {
+                        it.add(index - 1)
+
+                        while (it.size > 2) {
+                            it.removeAt(0)
+                        }
+                    }
             }
 
         return last

@@ -10,7 +10,7 @@ object Runner : AbstractRunner<Long>() {
 
     override fun part1(): Long = game.getNthNumber(2020)
 
-    override fun part2(): Long = 0L
+    override fun part2(): Long = game.getNthNumber(30_000_000)
 
     @JvmStatic
     fun main(args: Array<String>) {
