@@ -39,4 +39,16 @@ class TicketProcessorTest {
         assertThat(result, `is`(71L))
     }
 
+    @Test
+    fun calculateDepartureValue() {
+        val result = TicketProcessor.from(javaClass.getResource("/test_input_2.txt").readText())
+            .calculateDepartureValue(
+                setOf(
+                    "class", "row", "seat"
+                )
+            )
+
+        assertThat(result, `is`(12L * 11L * 13L))
+    }
+
 }

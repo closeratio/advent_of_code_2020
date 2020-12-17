@@ -6,7 +6,12 @@ object Runner : AbstractRunner<Long>() {
 
     override fun part1(): Long = processor.getInvalidValueSum()
 
-    override fun part2(): Long = 0
+    override fun part2(): Long = processor.calculateDepartureValue(
+        processor.fieldRules
+            .map { it.name }
+            .filter { it.startsWith("departure") }
+            .toSet()
+    )
 
     @JvmStatic
     fun main(args: Array<String>) {

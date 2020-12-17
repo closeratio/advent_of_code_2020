@@ -10,6 +10,42 @@ data class TicketProcessor(
         .flatMap { it.getInvalidValues(fieldRules) }
         .sum()
 
+    private fun findInvalidTickets(): List<Ticket> = nearbyTickets
+        .filter { it.isInvalid(fieldRules) }
+
+    fun calculateDepartureValue(
+        requiredFields: Set<String>
+    ): Long {
+        val validTickets = (nearbyTickets + myTicket) - findInvalidTickets().toSet()
+
+        val foundFields = hashMapOf<String, Int>()
+        val eliminatedIndices = hashSetOf<Int>()
+        val remainingFields = fieldRules.toMutableSet()
+
+        while (remainingFields.isNotEmpty()) {
+            remainingFields.firstOrNull { fieldRule ->
+                val validIndices = validTickets
+                    .map { ticket -> ticket.getValidIndices(fieldRule) }
+                    .reduce { acc, curr -> acc.intersect(curr) }
+                    .filter { it !in eliminatedIndices }
+
+                if (validIndices.size == 1) {
+                    foundFields[fieldRule.name] = validIndices.first()
+                    eliminatedIndices.add(validIndices.first())
+                    remainingFields.remove(fieldRule)
+                    true
+                } else {
+                    false
+                }
+            } ?: throw IllegalStateException("Unable to eliminate any more fields")
+        }
+
+        return requiredFields
+            .map { foundFields.getValue(it) }
+            .map { myTicket.values[it] }
+            .reduce { acc, curr -> acc * curr }
+    }
+
     companion object {
 
         @JvmStatic
