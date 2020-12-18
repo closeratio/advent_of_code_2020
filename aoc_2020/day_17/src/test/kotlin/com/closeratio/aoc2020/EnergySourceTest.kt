@@ -1,6 +1,7 @@
 package com.closeratio.aoc2020
 
 import com.closeratio.aoc2020.math.Vec3i
+import com.closeratio.aoc2020.math.Vec4i
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.collection.IsCollectionWithSize.hasSize
@@ -9,7 +10,9 @@ import org.junit.jupiter.api.Test
 
 class EnergySourceTest {
 
-    private val energySource = EnergySource.from(javaClass.getResource("/test_input_1.txt").readText())
+    private val energySource = EnergySource.from(
+        javaClass.getResource("/test_input_1.txt").readText()
+    ) { x, y -> Vec3i(x, y, 0) }
 
     @Test
     fun from() {
@@ -37,6 +40,17 @@ class EnergySourceTest {
         val result = energySource.iterate(6)
 
         assertThat(result, `is`(112))
+    }
+
+    @Test
+    fun iterateBootSequenceHyper() {
+        val hyperEnergySource = EnergySource.from(
+            javaClass.getResource("/test_input_1.txt").readText()
+        ) { x, y -> Vec4i(x, y, 0, 0) }
+
+        val result = hyperEnergySource.iterate(6)
+
+        assertThat(result, `is`(848))
     }
 
 }

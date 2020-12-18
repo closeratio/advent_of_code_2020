@@ -1,9 +1,9 @@
 package com.closeratio.aoc2020
 
-import com.closeratio.aoc2020.math.Vec3i
+import com.closeratio.aoc2020.math.Vec
 
 data class EnergySource(
-    val initialState: Set<Vec3i>
+    val initialState: Set<Vec>
 ) {
 
     fun iterate(count: Int): Int {
@@ -11,10 +11,9 @@ data class EnergySource(
 
         repeat(count) {
             val lastState = states.last()
-            val toEvaluate = lastState
+            states += lastState
                 .flatMap { it.adjacent() + it }
                 .toSet()
-            states += toEvaluate
                 .mapNotNull { vec ->
                     val adjacent = vec.adjacent().filter { it in lastState }
                     val surroundingActive = adjacent.intersect(lastState)
@@ -24,7 +23,8 @@ data class EnergySource(
                     } else {
                         if (surroundingActive.size == 3) vec else null
                     }
-                }.toSet()
+                }
+                .toSet()
         }
 
         return states.last().size
@@ -32,14 +32,17 @@ data class EnergySource(
 
     companion object {
 
-        fun from(input: String): EnergySource = input
+        fun from(
+            input: String,
+            creator: (Int, Int) -> Vec
+        ): EnergySource = input
             .trim()
             .split("\n")
             .map { it.trim() }
             .flatMapIndexed { y, line ->
                 line.mapIndexedNotNull { x, character ->
                     when (character) {
-                        '#' -> Vec3i(x, y, 0)
+                        '#' -> creator(x, y)
                         else -> null
                     }
                 }
