@@ -15,7 +15,7 @@ object ExpressionParser {
         while (currIndex < input.length) {
             val currChar = input[currIndex]
             when {
-                currChar.isDigit() -> elements += Number(currChar.toString().toLong())
+                currChar.isDigit() -> elements += NumberExpression(currChar.toString().toLong())
                 currChar == '+' -> elements += Plus()
                 currChar == '*' -> elements += Times()
                 currChar == '(' -> {

@@ -9,7 +9,7 @@ object Runner : AbstractRunner<Long>() {
 
     override fun part1(): Long = expressions.map { it.evaluate() }.sum()
 
-    override fun part2(): Long = 0L
+    override fun part2(): Long = expressions.map { it.evaluateAdvanced() }.sum()
 
     @JvmStatic
     fun main(args: Array<String>) {

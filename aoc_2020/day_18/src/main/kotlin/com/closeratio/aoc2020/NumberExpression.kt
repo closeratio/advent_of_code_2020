@@ -1,5 +1,5 @@
 package com.closeratio.aoc2020
 
-data class Number(
+data class NumberExpression(
     val value: Long
 ): Element()
