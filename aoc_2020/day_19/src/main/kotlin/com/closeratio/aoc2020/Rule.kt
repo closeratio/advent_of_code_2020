@@ -1,9 +1,13 @@
 package com.closeratio.aoc2020
 
 abstract class Rule(
-    val id: Int
+    val id: RuleId
 ) {
 
-    abstract fun getValidStringCombinations(): List<String>
+    abstract fun getMatchingSubstrings(
+        ruleMap: Map<RuleId, Rule>,
+        message: String,
+        index: Int
+    ): List<String>
 
 }

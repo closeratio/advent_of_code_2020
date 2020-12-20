@@ -12,37 +12,37 @@ class MessageProcessorTest {
 
     @Test
     fun from() {
-        val rule5 = LeafRule(5, "b")
-        val rule4 = LeafRule(4, "a")
+        val rule5 = LeafRule(RuleId(5), "b")
+        val rule4 = LeafRule(RuleId(4), "a")
 
         val rule3 = BranchRule(
-            3,
+            RuleId(3),
             listOf(
-                listOf(rule4, rule5),
-                listOf(rule5, rule4)
+                listOf(RuleId(4), RuleId(5)),
+                listOf(RuleId(5), RuleId(4))
             )
         )
 
         val rule2 = BranchRule(
-            2,
+            RuleId(2),
             listOf(
-                listOf(rule4, rule4),
-                listOf(rule5, rule5)
+                listOf(RuleId(4), RuleId(4)),
+                listOf(RuleId(5), RuleId(5))
             )
         )
 
         val rule1 = BranchRule(
-            1,
+            RuleId(1),
             listOf(
-                listOf(rule2, rule3),
-                listOf(rule3, rule2)
+                listOf(RuleId(2), RuleId(3)),
+                listOf(RuleId(3), RuleId(2))
             )
         )
 
         val rule0 = BranchRule(
-            0,
+            RuleId(0),
             listOf(
-                listOf(rule4, rule1, rule5)
+                listOf(RuleId(4), RuleId(1), RuleId(5))
             )
         )
 
@@ -67,9 +67,18 @@ class MessageProcessorTest {
 
     @Test
     fun getMatchingMessages() {
-        val result = processor.getMatchingMessages(0)
+        val result = processor.getMatchingMessages(RuleId(0))
 
         assertThat(result, `is`(2))
+    }
+
+    @Test
+    fun getMatchingMessagesAdvanced() {
+        val result = MessageProcessor
+            .from(javaClass.getResource("/test_input_2.txt").readText())
+            .getMatchingMessages(RuleId(0))
+
+        assertThat(result, `is`(12))
     }
 
 }

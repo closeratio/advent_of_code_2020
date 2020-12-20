@@ -1,31 +1,27 @@
 package com.closeratio.aoc2020
 
 class BranchRule(
-    id: Int,
-    val combinations: List<List<Rule>>
+    id: RuleId,
+    val combinations: List<List<RuleId>>
 ) : Rule(id) {
 
-    override fun getValidStringCombinations(): List<String> = combinations.flatMap { combination ->
-        val stringGroups: List<List<String>> = combination.map { it.getValidStringCombinations() }
+    override fun getMatchingSubstrings(
+        ruleMap: Map<RuleId, Rule>,
+        message: String,
+        index: Int
+    ): List<String> = combinations.flatMap { combination ->
+        combination.fold(
+            // Seed the matched string with the substring of the message up to this index
+            arrayListOf(listOf(message.substring(0, index)))
+        ) { acc, ruleId ->
+            val rule = ruleMap.getValue(ruleId)
 
-        stringGroups
-            .first()
-            .flatMap {
-                enumerateCombinations(it, stringGroups.drop(1))
+            acc += acc.last().flatMap { matchedSubstring ->
+                rule.getMatchingSubstrings(ruleMap, message, matchedSubstring.length)
             }
-    }
 
-    private fun enumerateCombinations(
-        currString: String,
-        combinations: List<List<String>>
-    ): List<String> = if (combinations.isEmpty()) {
-        listOf(currString)
-    } else {
-        combinations
-            .first()
-            .flatMap {
-                enumerateCombinations(currString + it, combinations.drop(1))
-            }
+            acc
+        }.last()
     }
 
     override fun equals(other: Any?): Boolean {

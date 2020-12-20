@@ -5,14 +5,20 @@ data class MessageProcessor(
     val messages: List<Message>
 ) {
 
-    fun getMatchingMessages(ruleId: Int): Int {
-        val validMessages = rules
-            .find { it.id == ruleId }!!
-            .getValidStringCombinations()
-            .toSet()
+    fun getMatchingMessages(ruleId: RuleId): Int {
+        val ruleMap = rules.associateBy { it.id }
+        val startingRule = ruleMap.getValue(ruleId)
 
         return messages
-            .filter { it.value in validMessages }
+            .filter { message ->
+                val matchingSubstrings = startingRule.getMatchingSubstrings(
+                    ruleMap,
+                    message.value,
+                    0
+                )
+
+                matchingSubstrings.any { it.length == message.value.length }
+            }
             .size
     }
 
@@ -22,17 +28,10 @@ data class MessageProcessor(
             val (ruleChunk, messageChunk) = input.trim()
                 .split("\n\n")
 
-            val ruleMap = hashMapOf<Int, Rule>()
-            val ruleStrings: Map<Int, String> = ruleChunk
+            val rules: List<Rule> = ruleChunk
                 .split("\n")
                 .map { it.trim() }
-                .associateBy { it.split(":").first().toInt() }
-
-            ruleMap[0] = parseRule(
-                ruleStrings.getValue(0),
-                ruleStrings,
-                ruleMap
-            )
+                .map { parseRule(it) }
 
             val messages = messageChunk
                 .split("\n")
@@ -40,25 +39,22 @@ data class MessageProcessor(
                 .map { Message(it) }
 
             return MessageProcessor(
-                ruleMap.values.toList(),
+                rules,
                 messages
             )
         }
 
         private fun parseRule(
-            ruleString: String,
-            ruleStrings: Map<Int, String>,
-            ruleMap: HashMap<Int, Rule>
+            ruleString: String
         ): Rule {
             val (idString, ruleBody) = ruleString
                 .split(":")
                 .map { it.trim() }
 
+            val id = RuleId(idString.toInt())
+
             if (ruleBody.startsWith("\"")) {
-                return LeafRule(
-                    idString.toInt(),
-                    ruleBody.trim('"')
-                )
+                return LeafRule(id, ruleBody.trim('"'))
             }
 
             val combinationStrings = ruleBody
@@ -66,19 +62,12 @@ data class MessageProcessor(
                 .map { it.trim() }
 
             return BranchRule(
-                idString.toInt(),
+                id,
                 combinationStrings.map { combination ->
                     combination
                         .split(" ")
-                        .map { it.toInt() }
-                        .map { id ->
-                            ruleMap.getOrPut(id) {
-                                parseRule(
-                                    ruleStrings.getValue(id),
-                                    ruleStrings,
-                                    ruleMap
-                                )
-                            }
+                        .map {
+                            RuleId(it.toInt())
                         }
 
                 }
