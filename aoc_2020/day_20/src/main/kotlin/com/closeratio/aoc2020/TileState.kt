@@ -15,8 +15,7 @@ data class TileState(
     fun rotate(): TileState = (1..size)
         .map { column ->
             (1..size).reversed().map { row ->
-                val result = pixels[row - 1][column - 1]
-                result
+                pixels[row - 1][column - 1]
             }
         }
         .let {

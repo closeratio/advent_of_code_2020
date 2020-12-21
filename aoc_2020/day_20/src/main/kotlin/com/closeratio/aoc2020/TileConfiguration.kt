@@ -8,12 +8,67 @@ data class TileConfiguration(
     val tiles: List<List<TileState>>
 ) {
 
+    private val size = tiles.size
+
+    private val combinedPixels: List<List<Char>> = let {
+        val builder = StringBuilder()
+        val trimmedTiles = tiles
+            .map { row ->
+                row.map { state ->
+                    state.pixels
+                        .drop(1)
+                        .dropLast(1)
+                        .map { it.drop(1).dropLast(1) }
+                }
+            }
+
+        trimmedTiles.forEach { row ->
+            repeat(trimmedTiles.first().first().size) { rowIndex ->
+                row.forEach { tile ->
+                    builder.append(tile[rowIndex].toCharArray())
+                }
+
+                builder.appendLine()
+            }
+        }
+
+        // Split up the generated string
+        builder.toString()
+            .split("\n")
+            .map { line -> line.map { it } }
+    }
+
     fun checksum(): Long = listOf(
         tiles.first().first().id,
         tiles.first().last().id,
         tiles.last().first().id,
         tiles.last().last().id
     ).reduce { acc, curr -> acc * curr }
+
+    fun rotate(): TileConfiguration = (1..size)
+        .map { column ->
+            (1..size).reversed().map { row ->
+                tiles[row - 1][column - 1].rotate()
+            }
+        }
+        .let {
+            TileConfiguration(it)
+        }
+
+    fun flip(): TileConfiguration = TileConfiguration(
+        tiles.map { row ->
+            row.reversed().map {
+                it.flip()
+            }
+        }
+    )
+
+    fun generateImage(): String {
+        return combinedPixels
+            .joinToString("\n") { line ->
+                line.joinToString("")
+            }
+    }
 
     companion object {
 
