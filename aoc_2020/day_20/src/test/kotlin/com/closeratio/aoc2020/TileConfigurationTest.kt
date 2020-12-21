@@ -18,20 +18,23 @@ class TileConfigurationTest {
 
     @Test
     fun generateImage() {
-        val permutations = listOf(
-            tileConfiguration,
-            tileConfiguration.rotate(),
-            tileConfiguration.rotate().rotate(),
-            tileConfiguration.rotate().rotate().rotate(),
-            tileConfiguration.flip(),
-            tileConfiguration.flip().rotate(),
-            tileConfiguration.flip().rotate().rotate(),
-            tileConfiguration.flip().rotate().rotate().rotate()
-        )
+        val permutations = tileConfiguration.permutations()
 
         assertThat(
             permutations.map { it.generateImage() },
             hasItem(javaClass.getResource("/test_input_1_expected_image.txt").readText())
+        )
+    }
+
+    @Test
+    fun calculateWaterRoughness() {
+        val result = tileConfiguration.calculateWaterRoughness(
+            SearchImage.from(javaClass.getResource("/search_image.txt").readText())
+        )
+
+        assertThat(
+            result,
+            `is`(273)
         )
     }
 

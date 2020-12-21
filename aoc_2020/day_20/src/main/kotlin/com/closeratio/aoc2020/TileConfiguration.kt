@@ -11,7 +11,6 @@ data class TileConfiguration(
     private val size = tiles.size
 
     private val combinedPixels: List<List<Char>> = let {
-        val builder = StringBuilder()
         val trimmedTiles = tiles
             .map { row ->
                 row.map { state ->
@@ -22,20 +21,17 @@ data class TileConfiguration(
                 }
             }
 
-        trimmedTiles.forEach { row ->
+        trimmedTiles.flatMap { row ->
+            val chars = arrayListOf<ArrayList<Char>>()
             repeat(trimmedTiles.first().first().size) { rowIndex ->
+                chars += arrayListOf<Char>()
+
                 row.forEach { tile ->
-                    builder.append(tile[rowIndex].toCharArray())
+                    chars.last() += tile[rowIndex]
                 }
-
-                builder.appendLine()
             }
+            chars
         }
-
-        // Split up the generated string
-        builder.toString()
-            .split("\n")
-            .map { line -> line.map { it } }
     }
 
     fun checksum(): Long = listOf(
@@ -45,7 +41,7 @@ data class TileConfiguration(
         tiles.last().last().id
     ).reduce { acc, curr -> acc * curr }
 
-    fun rotate(): TileConfiguration = (1..size)
+    private fun rotate(): TileConfiguration = (1..size)
         .map { column ->
             (1..size).reversed().map { row ->
                 tiles[row - 1][column - 1].rotate()
@@ -55,7 +51,7 @@ data class TileConfiguration(
             TileConfiguration(it)
         }
 
-    fun flip(): TileConfiguration = TileConfiguration(
+    private fun flip(): TileConfiguration = TileConfiguration(
         tiles.map { row ->
             row.reversed().map {
                 it.flip()
@@ -63,12 +59,32 @@ data class TileConfiguration(
         }
     )
 
-    fun generateImage(): String {
-        return combinedPixels
-            .joinToString("\n") { line ->
-                line.joinToString("")
-            }
-    }
+    fun generateImage(): String = combinedPixels
+        .joinToString("\n") { line ->
+            line.joinToString("")
+        }
+
+    fun permutations(): List<TileConfiguration> = listOf(
+        this,
+        rotate(),
+        rotate().rotate(),
+        rotate().rotate().rotate(),
+        flip(),
+        flip().rotate(),
+        flip().rotate().rotate(),
+        flip().rotate().rotate().rotate()
+    )
+
+    fun calculateWaterRoughness(
+        searchImage: SearchImage
+    ): Int = permutations()
+        .asSequence()
+        .map { searchImage.findTarget(combinedPixels) }
+        .filter { it > 0 }
+        .first()
+        .let { monsterPixelCount ->
+            combinedPixels.flatten().filter { it == '#' }.size - monsterPixelCount
+        }
 
     companion object {
 
