@@ -4,9 +4,9 @@ object Runner : AbstractRunner<Long>() {
 
     private val game = CombatGame.from(javaClass.getResource("/input.txt").readText())
 
-    override fun part1(): Long = game.computeWinningScore()
+    override fun part1(): Long = game.computeWinningScoreSimple()
 
-    override fun part2(): Long = 0L
+    override fun part2(): Long = game.computeWinningScoreAdvanced().second
 
     @JvmStatic
     fun main(args: Array<String>) {

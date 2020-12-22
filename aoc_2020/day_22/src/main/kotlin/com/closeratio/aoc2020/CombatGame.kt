@@ -4,37 +4,96 @@ class CombatGame(
     val initialState: List<Deck>
 ) {
 
-    fun computeWinningScore(): Long {
+    fun computeWinningScoreSimple(): Long {
         val totalCardCount = initialState.map { it.cards.size }.sum()
 
-        val mutableDecks = initialState
-            .map {
-                Deck(
-                    it.owner,
-                    ArrayList(it.cards)
-                )
-            }
+        val states = arrayListOf(
+            initialState
+        )
 
         // Keep iterating until one deck has all the cards and all the others are empty
-        while (mutableDecks.any { it.cards.isNotEmpty() && it.cards.size != totalCardCount }) {
-            val roundCards = mutableDecks
-                .map {
-                    val card = (it.cards as MutableList).removeAt(0)
-                    card to it
-                }
-                // Sort descending so that the first card in the list is the winning one
-                .sortedByDescending { it.first.value }
+        while (states.last().any { it.cards.isNotEmpty() && it.cards.size != totalCardCount }) {
+            val roundCards = states.last().map { it.drawCard() }
 
-            (roundCards.first().second.cards as MutableList).addAll(roundCards.map { it.first })
+            val winner = roundCards.maxByOrNull { (card, _) -> card.value }!!.second.owner
+
+            states += roundCards
+                .map { (_, deck) ->
+                    when (deck.owner) {
+                        winner -> deck + roundCards.map { it.first }.sortedByDescending { it.value }
+                        else -> deck
+                    }
+                }
         }
 
-        val winningDeck = mutableDecks.find { it.cards.isNotEmpty() }!!
+        val winningDeck = states.last().find { it.cards.isNotEmpty() }!!
 
-        return winningDeck
-            .cards
-            .reversed()
-            .mapIndexed { index, card -> (index + 1) * card.value }
-            .sum()
+        return winningDeck.cards.computeScore()
+    }
+
+    fun computeWinningScoreAdvanced(): Pair<String, Long> {
+        val totalCardCount = initialState.map { it.cards.size }.sum()
+
+        val states = linkedSetOf(
+            initialState
+        )
+
+        var gameWinner: String? = null
+        var winningScore: Long? = null
+
+        // Keep iterating until one deck has all the cards and all the others are empty
+        while (gameWinner == null) {
+            // Each player takes the card out of the deck
+            val roundCards = states.last().map { it.drawCard() }
+
+            // If there's enough cards to recurse based on the value of the drawn cards, then recurse
+            // Otherwise normal rules of combat apply
+            val (winner, winningCardOrder) = if (roundCards.all { (card, deck) -> deck.cards.size >= card.value }) {
+                val winner = CombatGame(
+                    roundCards.map { (card, deck) ->
+                        Deck(
+                            deck.owner,
+                            deck.cards.take(card.value.toInt())
+                        )
+                    }
+                ).computeWinningScoreAdvanced().first
+
+                val winningCard = roundCards.find { it.second.owner == winner }!!.first
+                val remainingDeck = roundCards.filter { it.second.owner != winner }.map { it.first }
+
+                winner to listOf(winningCard) + remainingDeck
+            } else {
+                val winner = roundCards.maxByOrNull { (card, _) -> card.value }!!.second.owner
+
+                winner to roundCards.map { it.first }.sortedByDescending { it.value }
+            }
+
+            // Compute the new deck state
+            val newDeckState = roundCards
+                .map { (_, deck) ->
+                    when (deck.owner) {
+                        winner -> deck + winningCardOrder
+                        else -> deck
+                    }
+                }
+
+            val finished = newDeckState.all { it.cards.isEmpty() || it.cards.size == totalCardCount }
+
+            when {
+                 finished || newDeckState in states -> {
+                    gameWinner = winner
+                    winningScore = newDeckState
+                        .find { it.owner == winner }!!
+                        .cards
+                        .computeScore()
+                }
+                else -> {
+                    states += newDeckState
+                }
+            }
+        }
+
+        return gameWinner to winningScore!!
     }
 
     companion object {
@@ -57,5 +116,9 @@ class CombatGame(
             }
 
     }
+
+    private fun List<Card>.computeScore(): Long = reversed()
+        .mapIndexed { index, card -> (index + 1) * card.value }
+        .sum()
 
 }

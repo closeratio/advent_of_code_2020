@@ -29,10 +29,18 @@ class CombatGameTest {
     }
 
     @Test
-    fun computeWinningScore() {
-        val result = game.computeWinningScore()
+    fun computeWinningScoreSimple() {
+        val result = game.computeWinningScoreSimple()
 
         assertThat(result, `is`(306L))
+    }
+
+    @Test
+    fun computeWinningScoreAdvanced() {
+        val result = game.computeWinningScoreAdvanced()
+
+        assertThat(result.first, `is`("Player 2"))
+        assertThat(result.second, `is`(291L))
     }
 
 }
