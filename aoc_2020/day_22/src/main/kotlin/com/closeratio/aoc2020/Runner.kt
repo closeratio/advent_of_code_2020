@@ -6,7 +6,7 @@ object Runner : AbstractRunner<Long>() {
 
     override fun part1(): Long = game.computeWinningScoreSimple()
 
-    override fun part2(): Long = game.computeWinningScoreAdvanced().second
+    override fun part2(): Long = game.computeWinningScoreAdvanced().second // It's not 30462 - that's too low
 
     @JvmStatic
     fun main(args: Array<String>) {

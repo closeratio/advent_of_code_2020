@@ -48,8 +48,8 @@ class CombatGame(
 
             // If there's enough cards to recurse based on the value of the drawn cards, then recurse
             // Otherwise normal rules of combat apply
-            val (winner, winningCardOrder) = if (roundCards.all { (card, deck) -> deck.cards.size >= card.value }) {
-                val winner = CombatGame(
+            val winner = if (roundCards.all { (card, deck) -> deck.cards.size >= card.value }) {
+                CombatGame(
                     roundCards.map { (card, deck) ->
                         Deck(
                             deck.owner,
@@ -57,16 +57,13 @@ class CombatGame(
                         )
                     }
                 ).computeWinningScoreAdvanced().first
-
-                val winningCard = roundCards.find { it.second.owner == winner }!!.first
-                val remainingDeck = roundCards.filter { it.second.owner != winner }.map { it.first }
-
-                winner to listOf(winningCard) + remainingDeck
             } else {
-                val winner = roundCards.maxByOrNull { (card, _) -> card.value }!!.second.owner
-
-                winner to roundCards.map { it.first }.sortedByDescending { it.value }
+                roundCards.maxByOrNull { (card, _) -> card.value }!!.second.owner
             }
+
+            val winningCard = roundCards.find { it.second.owner == winner }!!.first
+            val remainingDeck = roundCards.filter { it.second.owner != winner }.map { it.first }
+            val winningCardOrder = listOf(winningCard) + remainingDeck
 
             // Compute the new deck state
             val newDeckState = roundCards
@@ -80,7 +77,11 @@ class CombatGame(
             val finished = newDeckState.all { it.cards.isEmpty() || it.cards.size == totalCardCount }
 
             when {
-                 finished || newDeckState in states -> {
+                newDeckState in states -> {
+                    gameWinner = "Player 1"
+                    winningScore = 0L
+                }
+                finished -> {
                     gameWinner = winner
                     winningScore = newDeckState
                         .find { it.owner == winner }!!
