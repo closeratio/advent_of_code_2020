@@ -19,7 +19,8 @@ data class Tile(
     fun southWest(): Vec2i = position + Vec2i(-1, 1)
 
     fun flip(): Tile = Tile(
-        position, when (colour) {
+        position,
+        when (colour) {
             BLACK -> WHITE
             WHITE -> BLACK
         }
@@ -33,6 +34,15 @@ data class Tile(
         Direction.SOUTHEAST -> southEast()
         Direction.SOUTHWEST -> southWest()
     }
+
+    fun adjacent(): Set<Vec2i> = setOf(
+        east(),
+        west(),
+        northEast(),
+        northWest(),
+        southEast(),
+        southWest()
+    )
 
 }
 
